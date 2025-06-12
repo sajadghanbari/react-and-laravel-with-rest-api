@@ -1,5 +1,5 @@
 import { createBrowserRouter } from 'react-router-dom';
-createBrowserRouter({
+const router = createBrowserRouter({
   routes: [
     {
       path: '/',
