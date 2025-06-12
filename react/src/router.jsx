@@ -1,9 +1,18 @@
 import { createBrowserRouter } from 'react-router-dom';
+import Login from './views/login.jsx';
 const router = createBrowserRouter({
   routes: [
     {
-      path: '/',
-      element: <App />,
+      path: '/login',
+      element: <Login />,
+    },
+    {
+      path: '/user',
+      element: <User />,
+    },
+    {
+      path: '/signup',
+      element: <Signup />,
     },
   ],
 });
