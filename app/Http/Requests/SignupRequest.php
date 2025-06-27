@@ -6,14 +6,14 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class SignupRequest extends FormRequest
 {
-    /**
+    /**w
      * Determine if the user is authorized to make this request.
      *
      * @return bool
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,9 @@ class SignupRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'name' => 'required|string|max:55',
+            'email' => 'required|string|email|max:255|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
         ];
     }
 }
