@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Http\Resources\UserResource;
 
 class UserController extends Controller
 {
@@ -16,17 +17,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return UserResource::collection(User::query()->orderBy('id','desc')->paginate(10));
     }
 
     /**
@@ -37,7 +28,10 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request)
     {
-        //
+    $data = $request->validate();
+    $data['password'] = bcrypt($data['password']);
+    $user = User::create($data);
+    return response(new UserResource($user),201);
     }
 
     /**
@@ -48,18 +42,7 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(User $user)
-    {
-        //
+        return new UserResource($user);
     }
 
     /**
@@ -71,7 +54,12 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user)
     {
-        //
+        $data = $request->validate();
+        if(isset($data['password'])){
+            $data['password'] = bcrypt($data['password']);
+        }
+        $user->update($data);
+        return new UserResource($user);
     }
 
     /**
@@ -82,6 +70,8 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        //
+        $user->delete();
+
+        return response("",204);
     }
 }
