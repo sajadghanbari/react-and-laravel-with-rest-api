@@ -7,71 +7,135 @@ use App\Models\User;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserResource;
+use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index()
     {
-        return UserResource::collection(User::query()->orderBy('id','desc')->paginate(10));
+        try {
+            $users = User::all();
+            return response()->json([
+                'data' => UserResource::collection($users),
+                'status' => 200,
+                'message' => 'Users retrieved successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'message' => 'Error retrieving users',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \App\Http\Requests\StoreUserRequest  $request
-     * @return \Illuminate\Http\Response
+     * @param  StoreUserRequest  $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(StoreUserRequest $request)
     {
-    $data = $request->validate();
-    $data['password'] = bcrypt($data['password']);
-    $user = User::create($data);
-    return response(new UserResource($user),201);
+        try {
+            $validated = $request->validated();
+            $validated['password'] = bcrypt($validated['password']);
+            $user = User::create($validated);
+            
+            return response()->json([
+                'data' => new UserResource($user),
+                'status' => 201,
+                'message' => 'User created successfully'
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'message' => 'Error creating user',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Http\Response
+     * @param  User  $user
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show(User $user)
     {
-        return new UserResource($user);
+        try {
+            return response()->json([
+                'data' => new UserResource($user),
+                'status' => 200,
+                'message' => 'User retrieved successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'message' => 'Error retrieving user',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \App\Http\Requests\UpdateUserRequest  $request
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Http\Response
+     * @param  UpdateUserRequest  $request
+     * @param  User  $user
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(UpdateUserRequest $request, User $user)
     {
-        $data = $request->validate();
-        if(isset($data['password'])){
-            $data['password'] = bcrypt($data['password']);
+        try {
+            $validated = $request->validated();
+            
+            if (isset($validated['password'])) {
+                $validated['password'] = bcrypt($validated['password']);
+            }
+            
+            $user->update($validated);
+            
+            return response()->json([
+                'data' => new UserResource($user),
+                'status' => 200,
+                'message' => 'User updated successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'message' => 'Error updating user',
+                'error' => $e->getMessage()
+            ], 500);
         }
-        $user->update($data);
-        return new UserResource($user);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Http\Response
+     * @param  User  $user
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(User $user)
     {
-        $user->delete();
-
-        return response("",204);
+        try {
+            $user->delete();
+            return response()->json([
+                'status' => 204,
+                'message' => 'User deleted successfully'
+            ], 204);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'message' => 'Error deleting user',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }
