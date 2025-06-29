@@ -1,30 +1,32 @@
-import {Link,Navigate, Outlet } from "react-router-dom";
-import { useStateContext } from "../contexts/ContextProvider";
-import { useEffect } from "react";
-import axiosClient from "../axios-client";
+import {Link, Navigate, Outlet} from "react-router-dom";
+import {useStateContext} from "../context/ContextProvider";
+import axiosClient from "../axios-client.js";
+import {useEffect} from "react";
 
 export default function DefaultLayout() {
-  const {user, token,setUser,setToken} =  useStateContext()
+  const {user, token, setUser, setToken, notification} = useStateContext();
 
-  if(!token)
-  {
-    return <Navigate to="/login" />
+  if (!token) {
+    return <Navigate to="/login"/>
   }
 
-  const onLogout = (ev) => {
-    ev.preventDefault();
+  const onLogout = ev => {
+    ev.preventDefault()
+
     axiosClient.post('/logout')
-    .then(()=>{
-      setToken(null)
-      setUser({})
-    })
+      .then(() => {
+        setUser({})
+        setToken(null)
+      })
   }
-  useEffect(()=>{
+
+  useEffect(() => {
     axiosClient.get('/user')
-    .then(({data})=>{
-      setUser(data)
-    })
-  },[])
+      .then(({data}) => {
+         setUser(data)
+      })
+  }, [])
+
   return (
     <div id="defaultLayout">
       <aside>
@@ -36,14 +38,20 @@ export default function DefaultLayout() {
           <div>
             Header
           </div>
+
           <div>
-            {user.name}
-            <a className="btn-logout" onClick={onLogout} href="#">Logout</a>
+            {user.name} &nbsp; &nbsp;
+            <a onClick={onLogout} className="btn-logout" href="#">Logout</a>
           </div>
         </header>
         <main>
-          <Outlet />
+          <Outlet/>
         </main>
+        {notification &&
+          <div className="notification">
+            {notification}
+          </div>
+        }
       </div>
     </div>
   )

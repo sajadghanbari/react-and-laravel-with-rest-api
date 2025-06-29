@@ -1,41 +1,39 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
-import Login from './views/login.jsx';
-import User from './views/user.jsx';
-import UserForm from './views/userForm.jsx';
-import Signup from './views/signup.jsx';
-import NotFound from './views/notFound.jsx';
-import DefaultLayout from './components/DefaultLayout.jsx';
-import GuestLayout from './components/GuestLayout.jsx';
-import DashBoard from './views/dashBoard.jsx';
+import {createBrowserRouter, Navigate} from "react-router-dom";
+import Dashboard from "./Dashboard.jsx";
+import DefaultLayout from "./components/DefaultLayout";
+import GuestLayout from "./components/GuestLayout";
+import Login from "./views/Login";
+import NotFound from "./views/NotFound";
+import Signup from "./views/Signup";
+import Users from "./views/Users";
+import UserForm from "./views/UserForm";
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <DefaultLayout />,
+    element: <DefaultLayout/>,
     children: [
       {
         path: '/',
-        element: <Navigate to="/users"  />,
+        element: <Navigate to="/users"/>
       },
-
-            {
+      {
         path: '/dashboard',
-        element: <DashBoard />,
+        element: <Dashboard/>
       },
-            {
+      {
         path: '/users',
-        element: <User />,
+        element: <Users/>
       },
-            {
+      {
         path: '/users/new',
-        element: <UserForm  key="userCreate"/>,
+        element: <UserForm key="userCreate" />
       },
-            {
+      {
         path: '/users/:id',
-        element: <UserForm key="userUpdate"/>,
-      },
-
-    ],
+        element: <UserForm key="userUpdate" />
+      }
+    ]
   },
   {
     path: '/',
@@ -43,20 +41,18 @@ const router = createBrowserRouter([
     children: [
       {
         path: '/login',
-        element: <Login />,
+        element: <Login/>
       },
-
       {
         path: '/signup',
-        element: <Signup />,
-      },
-    ],
+        element: <Signup/>
+      }
+    ]
   },
-
   {
-    path: '/*',
-    element: <NotFound />,
-  },
-]);
+    path: "*",
+    element: <NotFound/>
+  }
+])
 
 export default router;
