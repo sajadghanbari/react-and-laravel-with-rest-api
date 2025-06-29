@@ -6,7 +6,15 @@ export default function User() {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
+    const onDelete = (u) => {
+        if (!window.confirm("Are you sure you want delete this user?")){
+            return
+        }
+        axiosClient.delete(`/users/${u.id}`)
+        .then(() => {
+            getUsers()
+        })
+    }
     useEffect(() => {
         getUsers();
     }, []);
@@ -67,6 +75,13 @@ export default function User() {
                                 <th>Actions</th>
                             </tr>
                         </thead>
+                        {loading && <tbody>
+                            <tr>
+                                <td colSpan="5" className="text-center">
+
+                                </td>
+                            </tr>
+                        </tbody>} 
                         <tbody>
                             {users.map(user => (
                                 <tr key={user.id}>
@@ -76,7 +91,8 @@ export default function User() {
                                     <td>{new Date(user.created_at).toLocaleDateString()}</td>
                                     <td>
                                         <Link to={`/users/${user.id}`} className="btn-edit">Edit</Link>
-                                        <button className="btn-delete">Delete</button>
+                                        &nbsp;
+                                        <button onClick={ev =>onDelete(user)} className="btn-delete">Delete</button>
                                     </td>
                                 </tr>
                             ))}

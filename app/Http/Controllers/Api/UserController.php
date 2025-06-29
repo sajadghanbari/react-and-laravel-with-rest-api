@@ -16,23 +16,35 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
-    {
-        try {
-            $users = User::all();
-            return response()->json([
-                'data' => UserResource::collection($users),
-                'status' => 200,
-                'message' => 'Users retrieved successfully'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 500,
-                'message' => 'Error retrieving users',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+public function index(Request $request)
+{
+    try {
+        $perPage = $request->query('per_page', 10); // تعداد آیتم در هر صفحه
+        $page = $request->query('page', 1); // شماره صفحه
+        
+        $users = User::query()
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage, ['*'], 'page', $page);
+        
+        return response()->json([
+            'data' => UserResource::collection($users),
+            'meta' => [
+                'current_page' => $users->currentPage(),
+                'per_page' => $users->perPage(),
+                'total' => $users->total(),
+                'last_page' => $users->lastPage(),
+            ],
+            'status' => 200,
+            'message' => 'Users retrieved successfully'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 500,
+            'message' => 'Error retrieving users',
+            'error' => $e->getMessage()
+        ], 500);
     }
+}
 
     /**
      * Store a newly created resource in storage.
